@@ -1,10 +1,3 @@
-# Define your item pipelines here
-#
-# Don't forget to add your pipeline to the ITEM_PIPELINES setting
-# See: https://docs.scrapy.org/en/latest/topics/item-pipeline.html
-
-# useful for handling different item types with a single interface
-
 import mysql.connector
 
 class WeatherBotPipeline(object):
@@ -12,12 +5,10 @@ class WeatherBotPipeline(object):
     def __init__(self):
 
         self.conn = mysql.connector.connect(
-
             host="localhost",
             user="root",
             passwd="root",
             database="weather"
-
         )
         self.curr = self.conn.cursor()
         self.create_table()
@@ -38,14 +29,17 @@ class WeatherBotPipeline(object):
             date datetime,
             FOREIGN KEY (city_id) REFERENCES city(id))""")
 
+    def process_item(self, item, spider):
+        self.store_db(item)
+        return item
+
     def store_db(self,item):
         self.curr.execute("""INSERT IGNORE INTO city values(%s,%s,%s)""", (
             item["city_id"],
             item["city"],
             item["state"]))
 
-        self.curr.execute("""INSERT INTO weather values(%s,%s,%s,
-        %s,%s,%s,%s)""", (
+        self.curr.execute("""INSERT INTO weather values(%s,%s,%s,%s,%s,%s,%s)""", (
             item["city_id"], item["temperature"], item["humidity"],
             item["sensation"], item["wind_velocity"], item["pressure"],
             item["date"]))
