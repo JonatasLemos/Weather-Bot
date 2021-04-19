@@ -1,6 +1,5 @@
 import scrapy
 import json
-import time
 from ..items import WeatherBotItem
 
 class AllSpider(scrapy.Spider):
@@ -35,6 +34,6 @@ class AllSpider(scrapy.Spider):
             yield scrapy.Request(
                 url=f"https://www.climatempo.com.br/json/myclimatempo/user/weatherNow?idlocale={city_id}",
                 callback=self.parse)
-            time.sleep(1)
+        
 
 
